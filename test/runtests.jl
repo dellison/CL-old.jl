@@ -1,5 +1,7 @@
 using CL
 using Base.Test
 
-# write your own tests here
-@test 1 == 2
+for test in ["counter"]
+    println("testing $test")
+    include("test_$test.jl")
+end

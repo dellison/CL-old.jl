@@ -1,5 +1,9 @@
 module CL
 
-# package code goes here
+export Counter,
+    inc!, getcount, gettotal, most_frequent
+
+
+include("util/counter.jl")
 
 end # module
