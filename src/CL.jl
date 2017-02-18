@@ -5,5 +5,6 @@ export Counter,
 
 
 include("util/counter.jl")
+include("ml/featureindex.jl")
 
 end # module
