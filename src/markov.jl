@@ -1,13 +1,12 @@
-const MARKOV_START = "<START>"
-const MARKOV_END = "<END>"
+# const MARKOV_START = "<START>"
+# const MARKOV_END = "<END>"
 
 type MarkovState{T, N<:Number}
     transitions::Dict{T, Tuple{T,N}}
     total::N
-
     function MarkovState()
         new(Dict{T, Tuple{T,N}}(), 0)
-    end    
+    end
 end
 
 MarkovState() = MarkovState{Any, Int}()
@@ -31,7 +30,7 @@ function set!(state::MarkovState, x, n)
 end
 
 function weight{T,N}(state::MarkovState{T,N}, x)
-    _, weight = get(state.transitions, x, zero(N))
+    _, weight = get(state.transitions, x, (0, zero(N)))
     weight
 end
 
@@ -51,9 +50,11 @@ end
 type MarkovModel{T, N}
     order::Int
     states::Dict{T, MarkovState{T}}
+    start_sym::String
+    end_sym::String
 
-    function MarkovModel(n::N)
-        new(n, Dict{T, MarkovState{T, N}}())
+    function MarkovModel(n::N; start_sym = "-START-", end_sym = "-END-")
+        new(n, Dict{T, MarkovState{T, N}}(), start_sym, end_sym)
     end
 end
 
@@ -64,19 +65,28 @@ end
 import Base.show
 show(io::IO, m::MarkovModel) = print(io, "MarkovModel<$(m.order)>")
 
-state{T,N}(m::MarkovModel{T,N}, symbol::T) =
-    get!(()->MarkovState{T,N}(), m.states, symbol)
 
-function state{T,N}(m::MarkovModel{T,N}, symbols::Vector{T})
+# function state{T,N}(m::MarkovModel{T,N}, symbols::Vector{T})
+function state(m::MarkovModel, symbols::AbstractVector)
+    # @show symbols
     s = state(m, first(symbols))
+    # @show s
     for symbol in symbols
+        # @show symbol
         s, _ = next(s, symbol)
+        # @show s
     end
     s
 end
 
+function state{T,N}(m::MarkovModel{T,N}, symbol::T)
+    # @show symbol
+    get!(()->MarkovState{T,N}(), m.states, symbol)
+end
+
+
 function train!(m::MarkovModel, seq)
-    s = [[MARKOV_START for _=1:m.order] ; seq ; [MARKOV_END for _=1:m.order]]
+    s = [[m.start_sym for _=1:m.order] ; seq ; [m.end_sym for _=1:m.order]]
     for i = 1:length(s) - m.order
         gram = s[i:i+m.order]
         next = state(m, first(gram))
@@ -90,10 +100,10 @@ end
 function generate{T,N}(m::MarkovModel{T,N}, length = 0)
     seq = Any[]
     for i = 1:m.order
-        push!(seq, MARKOV_START)
+        push!(seq, m.start_sym)
     end
-    while seq[end] != MARKOV_END
+    while seq[end] != m.end_sym
         push!(seq, sample(state(m, seq[end-m.order+1:end])))
     end
-    filter(x -> x != MARKOV_START && x != MARKOV_END, seq)
+    filter(x -> x != m.start_sym && x != m.end_sym, seq)
 end

@@ -3,7 +3,8 @@ using Base.Test
 
 for test in ["counter",
              "featureindex",
-             "markov"]
+             "markov",
+             "ngramlm"]
     println("testing $test")
     include("test_$test.jl")
 end

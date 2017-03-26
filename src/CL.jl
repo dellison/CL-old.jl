@@ -9,8 +9,16 @@ export MarkovModel,
     train!,
     generate
 
+export NGramLM,
+    bigram_lm,
+    trigram_lm,
+    train!,
+    generate,
+    generates
+
 include("util/counter.jl")
 include("markov.jl")
+include("lm/ngramlm.jl")
 include("ml/featureindex.jl")
 
 end # module
