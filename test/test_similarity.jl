@@ -22,6 +22,15 @@ end
 function test_cosine()
     v1 = sparsevec([1, 2, 3], [10, 20, 30], 100)
     v2 = sparsevec([1, 2, 4], [10, 20, 40], 100)
+
+    cossim = CL.cosine(v1, v2)
+
+    a_dot_b = dot(v1, v2)
+    magn_a = CL.magnitude(v1)
+    magn_b = CL.magnitude(v2)
+
+    @test cossim == a_dot_b / (magn_a * magn_b)
+    @test_approx_eq_eps(cossim, 500 / (37.41 * 45.82), 1e-4 )
 end
 
 test_magnitude()
