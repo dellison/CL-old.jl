@@ -60,3 +60,12 @@ function onehot(idx::FeatureIndex, feature)
     a[index(idx, feature)] = 1
     a
 end
+
+import Base.sparsevec
+function sparsevec(m::FeatureIndex, features::AbstractArray)
+    sparsevec(Dict(CL.index(m, i)=>1 for i in features), m.nextindex)
+end
+
+function sparsevec(m::FeatureIndex, features::Dict)
+    sparsevec(Dict(CL.index(m, feat) => val for (feat, val) in features), m.nextindex)
+end

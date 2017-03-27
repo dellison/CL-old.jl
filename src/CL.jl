@@ -17,6 +17,7 @@ export NGramLM,
     generates
 
 include("util/counter.jl")
+include("util/similarity_metrics.jl")
 include("markov.jl")
 include("lm/ngramlm.jl")
 include("ml/featureindex.jl")
