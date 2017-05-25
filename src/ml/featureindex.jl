@@ -3,28 +3,44 @@
 type FeatureIndex{T}
     feature_map::Dict{T,Int}
     features::Vector{T}
+    max::Int
     nextindex::Int
+
+    # FeatureIndex(feature_map, features, max, nextindex) =
+    #     new(feature_map, features, max, nextindex)
 end
 
-function FeatureIndex(t::DataType = Any)
-    FeatureIndex(Dict{t,Int}(), t[], 1)
+# function FeatureIndex(feature_map, features, max, nextindex)
+#     FeatureIndex(feature_map, features, max, nextindex)
+# end
+
+function FeatureIndex(t::DataType = Any; max = 0)
+    FeatureIndex(Dict{t,Int}(), t[], max, 1)
 end
 
-function FeatureIndex{T}(feats::AbstractVector{T})
-    idx = FeatureIndex(T)
-    for feat in feats
-        index!(idx, feat)
+function FeatureIndex{T}(feats::AbstractVector{T}; max=0)
+    if max == 0
+        idx = FeatureIndex(T)
+        idx.max = max
+        for feat in feats
+            index!(idx, feat)
+        end
+        return idx
+    else
+        c = Counter(feats)
+        features, counts = sort([zip(c)...])[1:max]
+        @show features
+        return FeatureIndex(c.counts, features, max, 0)
     end
-    idx
 end
 
 """
 """
 function feature(m::FeatureIndex, i::Int)
     try
-        m.features[i]
+        return m.features[i]
     catch BoundsError
-        error("no feature at index $i"P)
+        error("no feature at index $i")
     end
 end
 
@@ -32,10 +48,14 @@ end
 """
 function index!(m::FeatureIndex, feature)
     get(m.feature_map, feature) do
-        i = m.nextindex
-        m.nextindex += 1
-        push!(m.features, feature)
-        m.feature_map[feature] = i
+        if m.nextindex == 0
+            return 0
+        else
+            i = m.nextindex
+            m.nextindex += 1
+            push!(m.features, feature)
+            return m.feature_map[feature] = i
+        end
     end
 end
 
@@ -56,9 +76,13 @@ end
 """
 """
 function onehot(idx::FeatureIndex, feature)
-    a = zeros(Int, idx.nextindex)
+    if idx.max == 0
+        a = zeros(Int, idx.nextindex)
+    else
+        a = zeros(Int, idx.max)
+    end
     a[index(idx, feature)] = 1
-    a
+    return a
 end
 
 import Base.sparsevec
