@@ -57,11 +57,13 @@ function inc!(c::Counter, x, i::Int64 = 1)
 end
 
 """
+    most_frequent(c::Counter)
+
+Return the most common item in Conuter c.
 """
 function most_frequent(c::Counter)
-    max_x = nothing
-    max_ct = 0
     length(c) == 0 && error("can't call most_frequent on a empty counter")
+    max_x, max_ct = nothing, 0
     for (x, ct) in c
         if ct > max_ct
             max_x = x
@@ -71,6 +73,14 @@ function most_frequent(c::Counter)
     max_x
 end
 
+"""
+    n_most_frequent(c::Counter, n::Int)
+
+Return a list of the most frequent n things in Counter c.
+"""
+function n_most_frequent{T}(c::Counter{T}, n::Int)
+    return map(first, sort(collect(c), by=last, rev=true)[1:n])
+end
 ##  iterating
 import Base: start, next, done
 start(c::Counter) = start(c.counts)
