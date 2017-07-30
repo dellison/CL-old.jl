@@ -3,6 +3,7 @@ module CL
 export Counter,
     inc!, getcount, gettotal,
     most_frequent, n_most_frequent
+export NestedCounter
 
 export train!
 

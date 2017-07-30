@@ -124,3 +124,59 @@ function show{T}(io::IO, x::Counter{T})
     # print(io, "<Counter ($total total, $uniq unique)>$ct_repr")
     print(io, "Counter{$T} ($t total, $uniq unique)")
 end
+
+function sample(c::Counter)
+    p = rand()
+    total = gettotal(c)
+    lst = nothing;
+    for (n, w) in c.counts
+        lst = n
+        p -= w / total
+        if p <= 0
+            return n
+        end
+    end
+    if lst === nothing
+        error("couldn't sample from counter $c")
+    else
+        return lst
+    end
+end
+
+"""
+"""
+type NestedCounter{Touter, Tinner}
+    dict::Dict{Touter, Counter{Tinner}}
+end
+
+NestedCounter() = NestedCounter(Dict{Any, Counter{Any}}())
+NestedCounter(t::DataType, t2::DataType=t) = NestedCounter(Dict{t, Counter{t2}}())
+
+function getcount(nc::NestedCounter, outer, inner)
+    if ! (outer in keys(nc.dict))
+        return 0
+    else
+        return getcount(nc.dict[outer], inner)
+    end
+end
+
+function getcount(nc::NestedCounter, outer)
+    if ! (outer in keys(nc.dict))
+        return 0
+    else
+        return gettotal(nc.dict[outer])
+    end
+end
+
+function gettotal(nc::NestedCounter, outer)
+    getcount(nc, outer)
+end
+
+function gettotal(nc::NestedCounter)
+    sum([gettotal(ctr) for (k, ctr) in nc.dict])
+end
+
+function inc!{T1,T2}(nc::NestedCounter{T1,T2}, outer, inner, n=1)
+    c = get!(()->Counter(T2), nc.dict, outer)
+    inc!(c, inner, n)
+end

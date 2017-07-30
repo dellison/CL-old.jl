@@ -15,4 +15,25 @@ function test_counter1()
     @test n_most_frequent(c2, 2) == ["3", "2"]
 end
 
+function test_nested_counter()
+    cc = NestedCounter()
+    @test gettotal(cc) == 0
+    @test getcount(cc, "not there") == 0
+
+    inc!(cc, "o1", "i1")
+    inc!(cc, "o1", "i2")
+    inc!(cc, "o1", "i2")
+    inc!(cc, "o2", "i3")
+    inc!(cc, "o2", "i3")
+    inc!(cc, "o2", "i3")
+
+    @test getcount(cc, "o1") == gettotal(cc, "o1") == 3
+    @test getcount(cc, "o1", "i1") == 1
+    @test getcount(cc, "o1", "i2") == 2
+    @test getcount(cc, "o1", "i3") == 0
+    @test getcount(cc, "o2", "i3") == 3
+    @test gettotal(cc) == 6
+end
+
 test_counter1()
+test_nested_counter()
