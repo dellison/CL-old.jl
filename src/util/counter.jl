@@ -144,6 +144,9 @@ function sample(c::Counter)
 end
 
 """
+    NestedCounter
+
+A dictionary of counters. This can conveniently be used as a sparse matrix.
 """
 type NestedCounter{Touter, Tinner}
     dict::Dict{Touter, Counter{Tinner}}

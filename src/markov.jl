@@ -14,6 +14,13 @@ MarkovState() = MarkovState{Any, Int}()
 next(state::MarkovState, x) =
     get!(state.transitions, x, (MarkovState(), 0))
 
+next_state(state::MarkovState, x) =
+    get!(state.transitions, x, (MarkovState(), 0))
+
+function next_states(m::MarkovState)
+    return keys(m.transitions)
+end
+
 function inc!(state::MarkovState, x, weight=1)
     state.total += weight
     n, w = next(state, x)
@@ -84,9 +91,20 @@ function state{T,N}(m::MarkovModel{T,N}, symbol::T)
     get!(()->MarkovState{T,N}(), m.states, symbol)
 end
 
+function state{T,N}(m::MarkovModel{T,N})
+    state(m, [m.start_sym for i=1:m.order])
+end
+
+function pad(m::MarkovModel, seq::AbstractVector)
+    [[m.start_sym for _=1:m.order] ; seq ; [m.end_sym for _=1:m.order]]
+end
+
+function pad(m::MarkovModel, seq::Tuple)
+    [[m.start_sym for _=1:m.order] ; [seq...] ; [m.end_sym for _=1:m.order]]
+end
 
 function train!(m::MarkovModel, seq)
-    s = [[m.start_sym for _=1:m.order] ; seq ; [m.end_sym for _=1:m.order]]
+    s = pad(m, seq)
     for i = 1:length(s) - m.order
         gram = s[i:i+m.order]
         next = state(m, first(gram))
@@ -107,3 +125,14 @@ function generate{T,N}(m::MarkovModel{T,N}, length = 0)
     end
     filter(x -> x != m.start_sym && x != m.end_sym, seq)
 end
+
+function p_symbol_cond{T,N}(m::MarkovModel{T,N}, history::T, symbol)
+    p_symbol_cond(m, [history], symbol)
+end
+
+function p_symbol_cond(m::MarkovModel, history::AbstractVector, symbol)
+    st = state(m, history)
+    w = weight(st, symbol)
+    return w / st.total
+end
+
