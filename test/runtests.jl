@@ -2,6 +2,7 @@ using CL
 using Base.Test
 
 for test in ["counter",
+             "spvectors",
              "featureindex",
              "markov",
              "ngramlm",

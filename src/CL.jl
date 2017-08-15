@@ -4,6 +4,8 @@ export Counter,
     inc!, getcount, gettotal,
     most_frequent, n_most_frequent
 export NestedCounter
+export SparseWeightVector, spvec,
+    set!, weight, total, magnitude
 
 export train!
 
@@ -19,6 +21,7 @@ export NGramLM,
     generates
 
 include("util/counter.jl")
+include("util/sparse_weight_vectors.jl")
 include("util/similarity_metrics.jl")
 include("markov.jl")
 include("lm/ngramlm.jl")
