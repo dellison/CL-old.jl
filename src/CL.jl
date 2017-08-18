@@ -22,6 +22,7 @@ export NGramLM,
 
 include("util/counter.jl")
 include("util/sparse_weight_vectors.jl")
+include("util/information_theory.jl")
 include("util/similarity_metrics.jl")
 include("markov.jl")
 include("lm/ngramlm.jl")

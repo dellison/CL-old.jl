@@ -3,6 +3,7 @@ using Base.Test
 
 for test in ["counter",
              "spvectors",
+             "information_theory",
              "featureindex",
              "markov",
              "ngramlm",
