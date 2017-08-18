@@ -8,8 +8,10 @@ function SparseWeightVector(Tkey=Any,Tval=Float64)
     SparseWeightVector(Dict{Tkey,Tval}())
 end
 
-spvec(keytype=Any,valtype=Float64) = SparseWeightVector(keytype,valtype)
+SparseWeightVector{K,V}(d::Dict{K,V}) = SparseWeightVector(d)
 
+spvec(keytype=Any,valtype=Float64) = SparseWeightVector(keytype,valtype)
+spvec(d::Dict) = SparseWeightVector(d)
 
 inc!(v::SparseWeightVector, x, i=1) =
     in(x, keys(v.w)) ? v.w[x] += i : v.w[x] = i
