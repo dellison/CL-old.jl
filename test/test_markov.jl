@@ -1,6 +1,6 @@
 import CL: MarkovModel, MarkovState, HMM
 
-import CL: p_state_cond, p_observ_state, viterbi
+import CL: p_state_cond, p_state_observ, viterbi
 
 function test_markov_state()
     state = MarkovState()
@@ -39,9 +39,9 @@ function test_bigram_hmm()
     @test p_state_cond(m, ["NNS"], "VBD") == 1.0
     @test p_state_cond(m, ["VBD"], ".") == 2/3
 
-    @test p_observ_state(m, "the", "DT") == 1.0
-    @test p_observ_state(m, "dogs", "VBZ") == 1.0
-    @test p_observ_state(m, "dogs", "NNS") == 0.5
+    @test p_state_observ(m, "DT", "the") == 1.0
+    @test p_state_observ(m, "VBZ", "dogs") == 1.0
+    @test p_state_observ(m, "NNS", "dogs") == 0.5
 
     states, lprob = CL.viterbi(m, split("the dogs ate ."))
 

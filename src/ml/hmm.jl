@@ -117,7 +117,7 @@ symbol_state_count(m::HMM, symbol, state) =
 # Calculate P(observation|state).
 # In the context of the HMM, this is the emission probability
 # of the observation (word) given the state (tag).
-function p_observ_state(m::HMM, observation, state)
+function p_state_observ(m::HMM, state, observation)
     sym_count = getcount(m.symbol_state_counts, observation, state)
     st = get(m.state_model.states, state, nothing)
     if st == nothing
@@ -135,7 +135,7 @@ function p_state_cond(m::HMM, history, symbol)
 end
 
 function logprob(m::HMM, history, state, observation)
-    lp_obs = log(p_observ_state(m, observation, state))
+    lp_obs = log(p_state_observ(m, state, observation))
     lp_seq = log(p_state_cond(m, history, state))
     return lp_obs + lp_seq                 
 end
