@@ -12,3 +12,8 @@ function argmax(v::SparseWeightVector)
     end
     max_x
 end
+
+function argmax(f::Function, xs)
+    i = indmax(map(f, xs))
+    getindex(xs, i)
+end
