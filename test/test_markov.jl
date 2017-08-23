@@ -56,8 +56,50 @@ end
 
 function test_trigram_hmm()
     m = HMM(2)
-    corpus = []
-    bos_history = [m.state_model.start_sym,m.state_model.start_sym]
+
+    corpus = ["the/DT cow/NN jumped/VBD over/PP the/DT moon/NN ./.",
+              "the/DT dish/NN ran/VBD away/RB with/PP the/DT spoon/NN ./."]
+    for sent in corpus
+        train!(m, map(tkn->split(tkn,"/"), split(sent)))
+    end
+
+    bos = m.state_model.start_sym
+    @test p_state_cond(m, [bos,bos], "DT") == 2/2
+    @test p_state_cond(m, [bos,bos], "NN") == 0
+    @test p_state_cond(m, [bos,"DT"], "NN") == 2/2
+    @test p_state_cond(m, ["DT","NN"], ".") == 2/4
+    @test p_state_cond(m, ["DT","NN"], "VBD") == 2/4
+    @test p_state_cond(m, ["DT","NN"], "X") == 0
+
+    # the/DT cow/NN ran/VBD with/PP the/DT moon/NN ./.
+    @test p_state_cond(m, [bos,bos], "DT") == 2/2    # the
+    @test p_state_cond(m, [bos,"DT"], "NN") == 2/2   # cow
+    @test p_state_cond(m, ["DT","NN"], "VBD") == 2/4 # jumped
+    @test p_state_cond(m, ["NN","VBD"], "PP") == 1/2 # over
+    @test p_state_cond(m, ["VBD","PP"], "DT") == 1/1 # the
+    @test p_state_cond(m, ["PP","DT"], "NN") == 2/2  # moon
+    @test p_state_cond(m, ["DT","NN"], ".") == 2/4   # .
+
+    @test p_state_observ(m, "DT", "the") == 4/4     # the
+    @test p_state_observ(m, "NN", "cow") == 1/4     # cow
+    @test p_state_observ(m, "VBD", "jumped") == 1/2 # jumped
+    @test p_state_observ(m, "PP", "over") == 1/2    # over
+    @test p_state_observ(m, "DT", "the") == 4/4     # the
+    @test p_state_observ(m, "NN", "moon") == 1/4    # moon
+    @test p_state_observ(m, ".", ".") == 2/2        # .
+
+    p_the = (2/2) * (4/4)
+    p_cow = (2/2) * (1/4)
+    p_jumped = (2/4) * (1/2)
+    p_over = (1/2) * (1/2)
+    p_the2 = (1/1) * (4/4)
+    p_moon = (2/2) * (1/4)
+    p_period = (2/4) * (2/2)
+
+    sent_lprob = log(p_the * p_cow * p_jumped * p_over * p_the2 * p_moon * p_period)
+    states, lprob = viterbi(m, split("the cow ran with the moon ."))
+    @test states == split("DT NN VBD PP DT NN .")
+    @test sent_lprob == lprob
 end
 
 test_markov_state()

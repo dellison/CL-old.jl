@@ -59,30 +59,32 @@ function decode2(v::ViterbiTrellis, i, history, current_state, observation, prob
 end
 
 
+"""
+    viterbi(m::HMM, sequence)
+
+Preict the most likely sequence of hidden states for the observed
+sequence using the Viterbi algorithm.
+Returns (tags, logprob)
+"""
 function viterbi(m::HMM, sequence)
+    BOS = m.state_model.start_sym
     T, N = length(sequence), length(m.state_model.states)
     trellis = viterbi_trellis(length(sequence))
-    last_state, last_label = state(m.state_model), m.state_model.start_sym
-    history = [m.state_model.start_sym for i in 1:m.state_model.order]
+    history = [BOS for i in 1:m.state_model.order]
     observation = sequence[1]
     for first_state in keys(m.state_model.states)
         p = logprob(m, history, first_state, observation)
-        decode2(trellis, 1, history, first_state, observation, p)
+        decode(trellis, 1, history, first_state, observation, p)
     end
     _history = copy(history)
     max_state = ""
     max_p = -Inf
     for i in 2:T
-        prev_history =
-            if m.state_model.order > 1
-                _history[2:end]
-            else
-                []
-            end
         observation = sequence[i]
         max_state = ""
         max_p = -Inf
         for (prev_state, cell) in trellis.V[i-1]
+            prev_history = m.state_model.order > 1 ? cell.prev[2:end] : []
             _history = [prev_history ; [prev_state]]
             st = state(m.state_model, _history)
             for next_st in keys(st.transitions)
@@ -91,7 +93,7 @@ function viterbi(m::HMM, sequence)
                     max_p = p
                     max_state = next_st
                 end
-                decode2(trellis, i, _history, next_st, observation, p)
+                decode(trellis, i, _history, next_st, observation, p)
             end
         end
     end
