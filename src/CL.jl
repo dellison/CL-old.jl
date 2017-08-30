@@ -20,7 +20,7 @@ export NGramLM,
     generate,
     generates
 
-include("alphabet.jl")
+include("util/alphabet.jl")
 include("util/counter.jl")
 include("util/sparse_weight_vectors.jl")
 include("util/math.jl")
