@@ -30,5 +30,6 @@ include("markov.jl")
 include("lm/ngramlm.jl")
 include("ml/featureindex.jl")
 include("ml/hmm.jl")
+include("grammar/phrase_structures.jl")
 
 end # module

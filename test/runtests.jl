@@ -9,7 +9,8 @@ for test in ["counter",
              "featureindex",
              "markov",
              "ngramlm",
-             "similarity"]
+             "similarity",
+             "phrase_structure"]
     println("testing $test")
     include("test_$test.jl")
 end
