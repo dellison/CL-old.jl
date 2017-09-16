@@ -20,6 +20,7 @@ export NGramLM,
     generate,
     generates
 
+include("util/data_structures/trees.jl")
 include("util/alphabet.jl")
 include("util/counter.jl")
 include("util/sparse_weight_vectors.jl")
@@ -30,6 +31,5 @@ include("markov.jl")
 include("lm/ngramlm.jl")
 include("ml/featureindex.jl")
 include("ml/hmm.jl")
-include("grammar/phrase_structures.jl")
 
 end # module

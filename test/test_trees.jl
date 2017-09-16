@@ -1,6 +1,6 @@
-using CL: PhraseStructureTree, read_tree, dfs, isterminal
+using CL.Trees: read_tree, label, dfs, bfs, isleaf
 
-function test_tree()
+function test_phrase_structure_trees()
     sentence = """( (S 
     (NP-SBJ 
       (NP (NNP Pierre) (NNP Vinken) )
@@ -18,15 +18,18 @@ function test_tree()
     (. .) ))"""
 
     t = read_tree(sentence)
-    @test t.label == "S"
+    
+    @test label(t) == "S"
     npsubj, vp = t.children
-    @test npsubj.label == "NP-SBJ"
-    @test vp.label == "VP"
+    @test label(npsubj) == "NP-SBJ"
+    @test label(vp) == "VP"
 
-    wd(n) = n.children[1].label
-    words = [wd(node) for node in dfs(t) if isterminal(node)]
+    # wd(n) = n.children[1].label
+    words = [label(node) for node in dfs(t) if isleaf(node)]
     gold_words = split("Pierre Vinken , 61 years old , will join the board as a nonexecutive director Nov. 29 .")
     @test words == gold_words
+
+    words2 = [label(node) for node in bfs(t) if isleaf(node)]
 end
 
-test_tree()
+test_phrase_structure_trees()

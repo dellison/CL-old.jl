@@ -10,7 +10,7 @@ for test in ["counter",
              "markov",
              "ngramlm",
              "similarity",
-             "phrase_structure"]
+             "trees"]
     println("testing $test")
     include("test_$test.jl")
 end
