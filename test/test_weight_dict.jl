@@ -17,8 +17,8 @@ end
 
 function test_nested_counter()
     cc = NestedCounter()
-    @test gettotal(cc) == 0
-    @test getcount(cc, "not there") == 0
+    @test total(cc) == 0
+    @test count(cc, "not there") == 0
 
     inc!(cc, "o1", "i1")
     inc!(cc, "o1", "i2")
@@ -27,7 +27,7 @@ function test_nested_counter()
     inc!(cc, "o2", "i3")
     inc!(cc, "o2", "i3")
 
-    @test count(cc, "o1") == total(cc, "o1") == 3
+    @test count(cc, "o1") == 3
     @test count(cc, "o1", "i1") == 1
     @test count(cc, "o1", "i2") == 2
     @test count(cc, "o1", "i3") == 0
