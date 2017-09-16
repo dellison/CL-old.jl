@@ -12,6 +12,7 @@ function WeightDict(K::Type=Any,V::Type=Float64)
     weights = Dict{K,V}()
     WeightDict{K,V}(weights, 0, false, 0, false)
 end
+typealias spvec WeightDict
 
 # from a dict
 function WeightDict{K,V<:Number}(d::Dict{K,V})
@@ -39,6 +40,8 @@ function inc!(d::WeightDict, x, i=1)
     d._total_cached = d._magnitude_cached = false
     in(x, keys(d.weights)) ? d.weights[x] += 1 : d.weights[x] = i
 end
+
+set!(d::WeightDict, x, v) = setindex!(d, v, x)
 
 # treating a WeightDict just like a regular dict
 import Base: keys, values, get, getindex, setindex!, in, length
@@ -98,9 +101,9 @@ keys(d::NestedWeightDict) = keys(d.weights)
 values(d::NestedWeightDict) = values(d.weights)
 get(d::NestedWeightDict, args...) = get(d.weights, args...)
 get(f::Function, d::NestedWeightDict, x) = get(f, d.weights, x)
-getindex(d::NestedWeightDict, args...) = getindex(d.weights, args...)
+getindex(d::NestedWeightDict, arg) = getindex(d.weights, arg)
 function setindex!(d::NestedWeightDict, args...)
-    d._total_cached = d._magnitude_cached = false
+    # d._total_cached = d._magnitude_cached = false
     setindex!(d.weights, args...)
 end
 in(x, d::NestedWeightDict) = in(x, keys(d.weights))
