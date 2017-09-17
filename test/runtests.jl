@@ -1,8 +1,9 @@
 using CL
 using Base.Test
 
-for test in ["counter",
-             "spvectors",
+for test in [#"counter",
+             #"spvectors",
+             "weight_dict",
              "math",
              "information_theory",
              "alphabet",

@@ -7,6 +7,7 @@ type WeightDict{K,V<:Number}
     magnitude::Float64
     _magnitude_cached::Bool
 end
+typealias SparseWeightVector{K,V} WeightDict{K,V}
 
 function WeightDict(K::Type=Any,V::Type=Float64)
     weights = Dict{K,V}()
@@ -35,7 +36,9 @@ function total(d::WeightDict)
     d._total_cached = true
     return d.total = sum(values(d.weights))
 end
-        
+
+magnitude(d::WeightDict) = sqrt(sum(x^2 for x in values(d.weights)))
+
 function inc!(d::WeightDict, x, i=1)
     d._total_cached = d._magnitude_cached = false
     in(x, keys(d.weights)) ? d.weights[x] += 1 : d.weights[x] = i
@@ -78,7 +81,9 @@ function argmax(d::WeightDict)
     end
     max_x
 end
+# most_frequent = argmax
 most_frequent(d::WeightDict) = argmax(d)
+
 n_most_frequent(d::WeightDict, n::Int) =
     map(first, sort(collect(d), by=last, rev=true)[1:n])
 
@@ -131,14 +136,18 @@ function inc!{K1,K2,V}(d::NestedWeightDict{K1,K2,V}, x1, x2, n=1)
     inc!(w, x2, n)
 end
 
+# function set!(d::NestedWeightDict, x1, x2, v)
+#     d = get!(d.weights, x1)
+#     d[x2] = v
+# end
+
 # "Counter" types as a special case
 typealias Counter{K} WeightDict{K,Int}
 Counter(K::Type=Any) = WeightDict(K,Int)
 Counter(d::Dict) = WeightDict(d)
 Counter(a::AbstractArray) = WeightDict(a)
-count(c::Counter, x) = weight(c, x)
+c(c::Counter, x) = weight(c, x)
 
 typealias NestedCounter{K1,K2} NestedWeightDict{K1,K2,Int}
 NestedCounter(K1::Type=Any,K2::Type=Any) = NestedWeightDict(K1,K2,Int)
-count(c::NestedCounter, xs...) = weight(c, xs...)
-          
+c(c::NestedCounter, xs...) = weight(c, xs...)

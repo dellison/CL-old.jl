@@ -111,16 +111,16 @@ function viterbi(m::HMM, sequence)
 end
 
 
-symbol_count(m::HMM, symbol) = getcount(m.symbol_counts, symbol)
+symbol_count(m::HMM, symbol) = c(m.symbol_counts, symbol)
 symbol_state_count(m::HMM, symbol, state) =
-    getcount(m.symbol_state_counts, symbol, state)
+    c(m.symbol_state_counts, symbol, state)
 
 
 # Calculate P(observation|state).
 # In the context of the HMM, this is the emission probability
 # of the observation (word) given the state (tag).
 function p_state_observ(m::HMM, state, observation)
-    sym_count = getcount(m.symbol_state_counts, observation, state)
+    sym_count = c(m.symbol_state_counts, observation, state)
     st = get(m.state_model.states, state, nothing)
     if st == nothing
         return 0

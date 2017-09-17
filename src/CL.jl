@@ -1,11 +1,10 @@
 module CL
 
-export Counter,
-    inc!, getcount, gettotal,
+export WeightDict, weight, total, inc!, set!,
     most_frequent, n_most_frequent
-export NestedCounter
-export SparseWeightVector, spvec,
-    set!, weight, total, magnitude
+
+export Counter, c, total,
+    NestedCounter
 
 export train!
 
@@ -21,9 +20,8 @@ export NGramLM,
     generates
 
 include("util/data_structures/trees.jl")
+include("util/data_structures/weight_dict.jl")
 include("util/alphabet.jl")
-include("util/counter.jl")
-include("util/sparse_weight_vectors.jl")
 include("util/math.jl")
 include("util/information_theory.jl")
 include("util/similarity_metrics.jl")

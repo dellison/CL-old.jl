@@ -4,9 +4,9 @@
 Entropy of a Counter, as a discrete probability distribution.
 """
 function entropy(c::Counter)
-    ent, total = 0.0, gettotal(c)
+    ent, t = 0.0, total(c)
     for (x, count) in c
-        p = count / total
+        p = count / t
         ent -= p * log2(p)
     end
     return ent
@@ -18,7 +18,7 @@ end
 Entropy of a sparse weight vector.
 """
 function entropy(v::SparseWeightVector)
-    ent, total = 0.0, gettotal(v)
+    ent, total = 0.0, total(v)
     for (x, c) in v.dict
         p = count / total
         ent -= p * log2(p)
@@ -32,7 +32,7 @@ end
 Entropy of the distribution of "outer" values.
 """
 function entropy(m::NestedCounter)
-    ent, total = 0.0, gettotal(m)
+    ent, total = 0.0, total(m)
     for (x, c) in m.dict
         p = gettotal(c) / total
         ent -= p * log2(p)
