@@ -185,7 +185,7 @@ function total(d::NestedWeightDict)
 end
 
 function inc!{K1,K2,V}(d::NestedWeightDict{K1,K2,V}, x1, x2, n=1)
-    w = get!(()->Counter(K2), d.weights, x1)
+    w = get!(()->WeightDict(K2,V), d.weights, x1)
     inc!(w, x2, n)
 end
 
