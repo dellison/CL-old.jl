@@ -1,4 +1,3 @@
-# this is meant to unify Counters and SparseWeightVectors
 
 type WeightDict{K,V<:Number}
     weights::Dict{K,V}

@@ -13,12 +13,11 @@ function entropy(d::WeightDict)
 end
 
 """
-    entropy(m::NestedCounter)
+    entropy(m::NestedWeightDict)
 
 Entropy of the distribution of "outer" values.
 """
 function entropy(m::NestedWeightDict)
-# function entropy(m::NestedCounter)
     ent, total = 0.0, total(m)
     for (x, c) in m.dict
         p = gettotal(c) / total
@@ -28,7 +27,7 @@ function entropy(m::NestedWeightDict)
 end
 
 """
-    entropy(m::NestedCounter, x)
+    entropy(m::NestedWeightDict, x)
 
 Entropy of the distribution of "outer" values.
 """
