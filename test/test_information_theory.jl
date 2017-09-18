@@ -1,7 +1,6 @@
 import CL: entropy
 
 function test_entropy()
-
     dist1 = Counter([1,2])
     @test entropy(dist1) == 1.0 # one bit
 
