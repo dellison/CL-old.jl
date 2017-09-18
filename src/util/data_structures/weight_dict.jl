@@ -147,11 +147,12 @@ end
 
 type NestedWeightDict{K1,K2,V}
     weights::Dict{K1,WeightDict{K2,V}}
+    grand_total::V
 end
 
 function NestedWeightDict(K1=Any,K2=Any,V=Float64)
     w = Dict{K1,WeightDict{K2,V}}()
-    NestedWeightDict{K1,K2,V}(w)
+    NestedWeightDict{K1,K2,V}(w, zero(V))
 end
 
 # treating a NestedWeightDict just like a regular dict
@@ -186,6 +187,7 @@ end
 
 function inc!{K1,K2,V}(d::NestedWeightDict{K1,K2,V}, x1, x2, n=1)
     w = get!(()->WeightDict(K2,V), d.weights, x1)
+    d.grand_total += n
     inc!(w, x2, n)
 end
 
