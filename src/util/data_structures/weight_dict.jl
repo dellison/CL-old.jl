@@ -117,7 +117,6 @@ n_most_frequent(d::WeightDict, n::Int) =
     map(first, sort(collect(d), by=last, rev=true)[1:n])
 
 # TODO: probability
-
 function p(d::WeightDict, x; smooth="MLE")
     if smooth == "MLE"
         return weight(d, x) / total(d)
@@ -130,9 +129,9 @@ end
 
 function sample(d::WeightDict)
     p = rand()
-    tot = total(c)
+    tot = total(d)
     lst = nothing;
-    for (x, w) in c.weights
+    for (x, w) in d.weights
         lst = x
         p -= w / tot
         if p <= 0
@@ -140,7 +139,7 @@ function sample(d::WeightDict)
         end
     end
     if lst === nothing
-        error("couldn't sample from counter $c")
+        error("couldn't sample from WeightDict $d")
     else
         return lst
     end
