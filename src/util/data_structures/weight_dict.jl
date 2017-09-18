@@ -118,13 +118,16 @@ n_most_frequent(d::WeightDict, n::Int) =
 # TODO: probability
 function p(d::WeightDict, x; smooth="MLE")
     if smooth == "MLE"
-        return weight(d, x) / total(d)
+        return prob_mle(d, x)
     elseif smooth == "add1"
-        return (weight(d, x)+1) / (total(d)+1)
+        return prob_add1(d, x)
     else
         error("unknown smoothing method '$smooth'")
     end
 end
+
+prob_mle(d::WeightDict, x) = weight(d, x) / total(d)
+prob_add1(d::WeightDict, x) = (weight(d, x)+1) / (total(d)+1)
 
 function sample(d::WeightDict)
     p = rand()
