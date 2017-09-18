@@ -19,6 +19,10 @@ typealias spvec WeightDict
 function WeightDict{K,V<:Number}(d::Dict{K,V})
     WeightDict{K,V}(d, 0, false, 0, false)
 end
+function WeightDict{K,V<:Number}(pairs::Pair{K,V}...)
+    weights = Dict{K,V}(pairs)
+    WeightDict{K,V}(weights, 0, false, 0, false)
+end
 
 # from a collection
 function WeightDict{K}(a::AbstractArray{K})
@@ -37,14 +41,40 @@ function total(d::WeightDict)
     return d.total = sum(values(d.weights))
 end
 
-magnitude(d::WeightDict) = sqrt(sum(x^2 for x in values(d.weights)))
-
 function inc!(d::WeightDict, x, i=1)
     d._total_cached = d._magnitude_cached = false
     in(x, keys(d.weights)) ? d.weights[x] += 1 : d.weights[x] = i
 end
 
 set!(d::WeightDict, x, v) = setindex!(d, v, x)
+
+# treating WeightDict as a sparse vector in euclidean space
+function magnitude(d::WeightDict)
+    d._magnitude_cached && return d.magnitude
+    d._magnitude_cached = true
+    return d.magnitude = sqrt(sum(x^2 for x in values(d.weights)))
+end
+
+import Base: dot
+function dot(a::WeightDict, b::WeightDict)
+    dotp = 0
+    for x in intersect(keys(a.weights), keys(b.weights))
+        dotp += (weight(a, x) * weight(b, x))
+    end
+    return dotp
+end
+
+function cosine(a::WeightDict, b::WeightDict)
+    dot(a, b) / (magnitude(a) * magnitude(b))
+end
+
+function euclid_dist(a::WeightDict, b::WeightDict)
+    squared_dist = 0
+    for x in union(keys(a.weights), keys(b.weights))
+        squared_dist += (weight(a, x) - weight(b, x))^2
+    end
+    return sqrt(squared_dist)
+end
 
 # treating a WeightDict just like a regular dict
 import Base: keys, values, get, getindex, setindex!, in, length
@@ -81,16 +111,40 @@ function argmax(d::WeightDict)
     end
     max_x
 end
-# most_frequent = argmax
-most_frequent(d::WeightDict) = argmax(d)
 
+most_frequent(d::WeightDict) = argmax(d)
 n_most_frequent(d::WeightDict, n::Int) =
     map(first, sort(collect(d), by=last, rev=true)[1:n])
 
 # TODO: probability
-# sampling
 
+function p(d::WeightDict, x; smooth="MLE")
+    if smooth == "MLE"
+        return weight(d, x) / total(d)
+    elseif smooth == "add1"
+        return (weight(d, x)+1) / (total(d)+1)
+    else
+        error("unknown smoothing method '$smooth'")
+    end
+end
 
+function sample(d::WeightDict)
+    p = rand()
+    tot = total(c)
+    lst = nothing;
+    for (x, w) in c.weights
+        lst = x
+        p -= w / tot
+        if p <= 0
+            return x
+        end
+    end
+    if lst === nothing
+        error("couldn't sample from counter $c")
+    else
+        return lst
+    end
+end
 
 type NestedWeightDict{K1,K2,V}
     weights::Dict{K1,WeightDict{K2,V}}
