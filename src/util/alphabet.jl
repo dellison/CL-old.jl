@@ -2,7 +2,8 @@ import Base: show, keys, values, start, next, done, length, getindex#, getindex!
 import Base: ==, in
 
 # Bijective mapping from strings to integers.
-# based on TODO
+# based on the one in Tim Vieira's arsenel:
+# https://github.com/timvieira/arsenal
 
 type Alphabet{T}
     map::Dict{T,Int}
@@ -31,7 +32,7 @@ function Alphabet(l::AbstractArray)
     return a
 end
 
-alphabet(a) = Alphabet(a)
+alphabet(args...) = Alphabet(args...)
 
 show(io::IO,a::Alphabet) =
    print(io, "Alphabet(size=$(a.i-1),frozen=$(a.isfrozen))")
@@ -49,7 +50,10 @@ start(a::Alphabet) = start(a.list)
 next(a::Alphabet, state) = next(a.list, state)
 done(a::Alphabet, state) = done(a.list, state)
 
-function getindex(a::Alphabet, x)
+_converttype{T}(a::Alphabet{T}, x) = convert(T,x)
+
+function getindex(a, x)
+    x = _converttype(a, x)
     get(a.map, x) do
         a.isfrozen && error("Alphabet is frozen. Key '$x' not found.")
         !a.isgrowing && return nothing
@@ -62,17 +66,9 @@ function getindex(a::Alphabet, x)
 end
 
 add(a::Alphabet, x) = getindex(a,x)
-
-function add_many(a::Alphabet, xs)
-    for x in xs
-        add(a, x)
-    end
-end
+add_many(a::Alphabet, xs) = [add(a, x) for x in xs]
 
 lookup(a::Alphabet, i::Int) = a.list[i]
 lookup_many(a::Alphabet, is) = [lookup(a,i) for i in is]
-# lookup_many(a::Alphabet, is) = map(i->lookup(a,i), is)
-
 
 plaintext(a::Alphabet) = join(a.list,"\n")
-    
