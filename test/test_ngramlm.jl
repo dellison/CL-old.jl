@@ -1,5 +1,5 @@
 
-import CL: p_mle, p_add1, p_linint
+import CL: gram, p_mle, p_add1, p_linint
 
 function test_lm()
     corpus = map(split, ["i am from pittsburgh .",
@@ -9,6 +9,9 @@ function test_lm()
     for sentence in corpus
         train!(lm, sentence)
     end
+
+    sent1 = corpus[1]
+    @test gram(lm, sent1, 1) == ["BOS","i"]
 
     @test CL.c(lm, "from") == 2
     @test CL.c(lm, "i") == 2
