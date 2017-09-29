@@ -32,12 +32,12 @@ eos(lm::NGramLM) = lm.model.end_sym
 
 # gram(lm::NGramLM, sentence, i) = sentence[i:i+lm.model.order]
 
-function gram(lm::NGramLM, sentence, i)
+function gram(lm::NGramLM, sentence, i::Int)
     f(x) = x >= 1 ? sentence[x] : lm.model.start_sym
     map(f, i-lm.model.order:i)
 end
 
-function hist(lm::NGramLM, sentence, i)
+function hist(lm::NGramLM, sentence, i::Int)
     f(x) = x >= 1 ? sentence[x] : lm.model.start_sym
     map(f, i-lm.model.order:i-1)
 end
