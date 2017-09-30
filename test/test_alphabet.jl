@@ -27,7 +27,14 @@ function test_alphabet()
     add_many(a, ["five", "six", "seven", "eight"])
     @test lookup_many(a, 5:8) == ["five", "six", "seven", "eight"]
 
+
+    @test a.isgrowing
     stop_growth!(a)
+    @test !a.isgrowing
+
+    @test !a.isfrozen
+    freeze!(a)
+    @test a.isfrozen
 end
 
 test_alphabet()
