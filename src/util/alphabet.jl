@@ -16,16 +16,8 @@ end
 
 Alphabet(t::DataType=String) = Alphabet(Dict{t,Int}(), t[], 1, false, true)
 
-function Alphabet(task::Task)
-    a = Alphabet()
-    for x in task
-        add(a, x)
-    end
-    return a
-end
-
-function Alphabet(l::AbstractArray)
-    a = Alphabet()
+function Alphabet{T}(l::AbstractArray{T})
+    a = Alphabet(T)
     for x in l
         add(a, x)
     end

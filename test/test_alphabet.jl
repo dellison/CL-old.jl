@@ -1,4 +1,4 @@
-import CL: Alphabet, lookup, plaintext
+import CL: Alphabet, alphabet, add, add_many, lookup, lookup_many, plaintext, freeze!, stop_growth!
 
 function test_alphabet()
     a = Alphabet()
@@ -13,7 +13,7 @@ function test_alphabet()
     @test lookup(a, 1) == "lol"
     @test lookup(a, 2) == "lol2"
 
-    a = Alphabet(split("one two three"))
+    a = alphabet(split("one two three"))
     @test a["one"] == 1
     @test a["two"] == 2
     @test a["three"] == 3
@@ -23,6 +23,19 @@ function test_alphabet()
     @test "four" in a
 
     @test plaintext(a) == "one\ntwo\nthree\nfour"
+
+    add_many(a, ["five", "six", "seven", "eight"])
+    @test lookup_many(a, 5:8) == ["five", "six", "seven", "eight"]
+
+
+    @test a.isgrowing
+    stop_growth!(a)
+    @test !a.isgrowing
+
+    @test !a.isfrozen
+    freeze!(a)
+    @test a.isfrozen
 end
 
 test_alphabet()
+

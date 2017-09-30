@@ -32,13 +32,13 @@ eos(lm::NGramLM) = lm.model.end_sym
 
 # gram(lm::NGramLM, sentence, i) = sentence[i:i+lm.model.order]
 
-function gram(lm::NGramLM, sentence, i)
-    f(x) = x >= 1 ? sentence[x] : MARKOV_START
+function gram(lm::NGramLM, sentence, i::Int)
+    f(x) = x >= 1 ? sentence[x] : lm.model.start_sym
     map(f, i-lm.model.order:i)
 end
 
-function hist(lm::NGramLM, sentence, i)
-    f(x) = x >= 1 ? sentence[x] : MARKOV_START
+function hist(lm::NGramLM, sentence, i::Int)
+    f(x) = x >= 1 ? sentence[x] : lm.model.start_sym
     map(f, i-lm.model.order:i-1)
 end
 
@@ -89,7 +89,7 @@ function p_add1(lm::NGramLM, gram)
         word, prev = gram[end], gram[1:end-1]
         st = state(lm.model, prev)
         w = weight(st, word)
-        return (w+1) / (lm.total+1)
+        return (w+1) / (st.total+1)
     end
 end
 
@@ -100,16 +100,18 @@ Estimate of the probability of the gram, using linear interpolation.
 Alpha should be a vector of floats that sum to 1 (forming a
 probability distribution). 
 """
-function p_linint(lm::NGramLM, gram, alpha)
+function p_linint(lm::NGramLM, ngram, alpha)
     if sum(alpha) != 1.0
         error("alpha terms for smoothing must add up to 1.0")
-    elseif length(alpha) != length(gram)
-        error("gram and alpha must be the same length")
+    elseif length(alpha) != length(ngram)
+        error("ngram and alpha must be the same length")
     else
         prob = 0.0
         for m = lm.model.order:-1:1
-            g = gram[lm.n-m:end]
+            g = ngram[lm.n-m:end]
+            # @show g
             a = alpha[end-m+1]
+            # println("+ ($a * $(p_mle(lm, g)))")
             prob += a * p_mle(lm, g)
         end
         return prob
